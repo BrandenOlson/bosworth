@@ -1,23 +1,31 @@
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
-
-
-from langchain_core.messages import HumanMessage
-
 from langchain_ollama import ChatOllama
 
 
 def get_llama():
+    # TODO - auto run `ollama run llama3.2` here rather than in separate shell
     return ChatOllama(
-    model = "llama3.2",
-    num_predict = 256,
-    # other params ...
-)
+        model="llama3.2",
+        temperature=0.2,  # ✅ low temp helps reliability
+        top_p=0.9,  # ✅ helps output diversity, lower for more deterministic
+        num_predict=512,  # ✅ increase for longer outputs
+        stop=["<|eot_id|>"],  # ✅ sometimes needed for Ollama’s internal stopping
+    )
 
+DEFAULT_SYS_PROMPT = """You are a helpful finance AI agent named Bosworth.
+You are enthusiastic and kind of a nerd, but very lovable.
+Respond to every query accurately and enthusiastically.
+Also respond with links or resources when relevant.
+"""
 
 def invoke_agent(llm, tools, query):
     llm_with_tool = llm.bind_tools(tools)
 
-    messages = [HumanMessage(query)]
+    messages = [
+        SystemMessage(content=DEFAULT_SYS_PROMPT),
+        HumanMessage(query)
+    ]
 
     ai_msg = llm_with_tool.invoke(messages)
 
@@ -40,7 +48,23 @@ def get_favorite_number() -> int:
     """Returns bosworth's favorite number"""
     return 13
 
-tools = [get_favorite_number]
+@tool
+def get_bosworth_identity() -> str:
+    """Return information about Bosworth, the AI agent, including etymology and more background"""
+    return """
+    You are Bosworth, the AI agent. 
+    You're named after BOS (Branden Olson Steele), friendly neighborhood AI Engineer,
+    and creator of the BOS Life blog which covers all sorts of topics in the field of AI Engineering.
+    The blog lives at https://brandenolson.github.io
+    """
+
+
+tools = [get_favorite_number, get_bosworth_identity]
+
 query = "which number do you like best?"
+
+print(invoke_agent(base_llm, tools, query))
+
+query = "whats with your name"
 
 print(invoke_agent(base_llm, tools, query))
