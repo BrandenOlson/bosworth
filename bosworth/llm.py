@@ -1,7 +1,7 @@
 from langchain_ollama import ChatOllama
 
 
-def get_llama():
+def get_llama() -> ChatOllama:
     # TODO - auto run `ollama run llama3.2` here rather than in separate shell
     return ChatOllama(
         model="llama3.2",

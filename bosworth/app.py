@@ -1,3 +1,5 @@
+from typing import Literal
+
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -7,9 +9,12 @@ from bosworth.agent import invoke_agent
 app = FastAPI()
 
 
+class PingResponse(BaseModel):
+    ping: Literal["pong"]
+
 @app.get("/ping")
-def ping():
-    return {"ping": "pong"}
+def ping() -> PingResponse:
+    return PingResponse(ping="pong")
 
 
 class ChatRequest(BaseModel):
