@@ -4,6 +4,12 @@ A BOS agent worth your while
 
 ## Setup 
 
+(Tested with Python 3.12.7.
+For best results, make sure your `python3` has this version.
+You can use [`pyenv`](https://github.com/pyenv/pyenv) for local `python` versioning if needed.)
+
+
+
 Create + activate Python env:
 
 ```
@@ -28,4 +34,9 @@ PYTHONPATH=. python bosworth/app/main.py
 Run the tests via
 ```
 pytest test
+```
+
+Run type checking via
+```
+mypy .
 ```
