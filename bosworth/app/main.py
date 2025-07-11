@@ -9,7 +9,7 @@ app = FastAPI()
 
 @app.get("/ping")
 def ping():
-    return {"Hello": "World"}
+    return {"ping": "pong"}
 
 
 class ChatRequest(BaseModel):

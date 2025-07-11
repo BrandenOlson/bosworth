@@ -1,17 +1,9 @@
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.tools import tool
-from langchain_ollama import ChatOllama
+from langchain_core.tools import BaseTool
+from langchain_core.language_models import BaseLLM
 
-
-def get_llama():
-    # TODO - auto run `ollama run llama3.2` here rather than in separate shell
-    return ChatOllama(
-        model="llama3.2",
-        temperature=0.2,  # ✅ low temp helps reliability
-        top_p=0.9,  # ✅ helps output diversity, lower for more deterministic
-        num_predict=512,  # ✅ increase for longer outputs
-        stop=["<|eot_id|>"],  # ✅ sometimes needed for Ollama’s internal stopping
-    )
+from bosworth.llm import DEFAULT_LLM
+from bosworth.tools import DEFAULT_TOOLS
 
 DEFAULT_SYS_PROMPT = """You are a helpful finance AI agent named Bosworth.
 You are enthusiastic and kind of a nerd, but very lovable.
@@ -20,29 +12,7 @@ Also respond with links or resources when relevant.
 """
 
 
-
-base_llm = get_llama()
-
-@tool
-def get_favorite_number() -> int:
-    """Returns bosworth's favorite number"""
-    return 13
-
-@tool
-def get_bosworth_identity() -> str:
-    """Return information about Bosworth, the AI agent, including etymology and more background"""
-    return """
-    You are Bosworth, the AI agent. 
-    You're named after BOS (Branden Olson Steele), friendly neighborhood AI Engineer,
-    and creator of the BOS Life blog which covers all sorts of topics in the field of AI Engineering.
-    The blog lives at https://brandenolson.github.io
-    """
-
-
-base_tools = [get_favorite_number, get_bosworth_identity]
-
-
-def invoke_agent(query: str, llm = base_llm, tools = base_tools):
+def invoke_agent(query: str, llm: BaseLLM = DEFAULT_LLM, tools: list[BaseTool] = DEFAULT_TOOLS):
     llm_with_tool = llm.bind_tools(tools)
 
     messages = [
