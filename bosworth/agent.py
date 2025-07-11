@@ -19,26 +19,6 @@ Respond to every query accurately and enthusiastically.
 Also respond with links or resources when relevant.
 """
 
-def invoke_agent(llm, tools, query):
-    llm_with_tool = llm.bind_tools(tools)
-
-    messages = [
-        SystemMessage(content=DEFAULT_SYS_PROMPT),
-        HumanMessage(query)
-    ]
-
-    ai_msg = llm_with_tool.invoke(messages)
-
-    print(ai_msg.tool_calls)
-
-    messages.append(ai_msg)
-
-    for tool_call in ai_msg.tool_calls:
-        selected_tool = {t.name: t for t in tools}[tool_call["name"].lower()]
-        tool_msg = selected_tool.invoke(tool_call)
-        messages.append(tool_msg)
-
-    return llm_with_tool.invoke(messages).content
 
 
 base_llm = get_llama()
@@ -59,12 +39,26 @@ def get_bosworth_identity() -> str:
     """
 
 
-tools = [get_favorite_number, get_bosworth_identity]
+base_tools = [get_favorite_number, get_bosworth_identity]
 
-query = "which number do you like best?"
 
-print(invoke_agent(base_llm, tools, query))
+def invoke_agent(query: str, llm = base_llm, tools = base_tools):
+    llm_with_tool = llm.bind_tools(tools)
 
-query = "whats with your name"
+    messages = [
+        SystemMessage(content=DEFAULT_SYS_PROMPT),
+        HumanMessage(query)
+    ]
 
-print(invoke_agent(base_llm, tools, query))
+    ai_msg = llm_with_tool.invoke(messages)
+
+    print(ai_msg.tool_calls)
+
+    messages.append(ai_msg)
+
+    for tool_call in ai_msg.tool_calls:
+        selected_tool = {t.name: t for t in tools}[tool_call["name"].lower()]
+        tool_msg = selected_tool.invoke(tool_call)
+        messages.append(tool_msg)
+
+    return llm_with_tool.invoke(messages).content
