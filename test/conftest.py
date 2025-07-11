@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from bosworth.app.main import app
+from bosworth.app import app
 
 @pytest.fixture
 def client() -> TestClient:

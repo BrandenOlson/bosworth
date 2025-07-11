@@ -1,7 +1,5 @@
 from fastapi.testclient import TestClient
-import pytest
 
-from bosworth.app.main import ChatRequest
 
 def test_ping(client: TestClient) -> None:
     result = client.get("/ping")
