@@ -32,9 +32,13 @@ else
   exit 1
 fi
 
-echo "📦 Pulling models (llama3.2 and mistral)..."
-ollama pull llama3.2
-ollama pull mistral
+echo "📦 Pulling supported Ollama models from Python Enum..."
+MODELS=$(python3 bosworth/ollama_models.py)
+
+for model in $MODELS; do
+  echo "  ➤ Pulling $model..."
+  ollama pull "$model"
+done
 
 echo "🧪 Verifying models are registered..."
 ollama list | grep -E "llama3.2|mistral"
