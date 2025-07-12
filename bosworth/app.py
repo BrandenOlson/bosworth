@@ -20,7 +20,7 @@ def ping() -> PingResponse:
 
 class ChatRequest(BaseModel):
     query: str
-    conversation_id: str = uuid4()
+    conversation_id: str = str(uuid4())
 
 
 class ChatResponse(BaseModel):
@@ -30,7 +30,10 @@ class ChatResponse(BaseModel):
 @app.post("/chat")
 def chat(request: ChatRequest) -> ChatResponse:
     return ChatResponse(
-        content=invoke_graph(query=request.query, conversation_id=request.conversation_id)
+        content=invoke_graph(
+            query=request.query,
+            conversation_id=request.conversation_id,
+        ).content
     )
 
 

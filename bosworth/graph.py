@@ -22,7 +22,8 @@ llm = DEFAULT_LLM
 
 # Define your state schema
 class State(TypedDict):
-    messages: List[str]
+    messages: List[BaseMessage]
+
 
 def agent_node(state: State, config: dict) -> State:
     query = config["configurable"]["input"]
@@ -57,10 +58,6 @@ def agent_node(state: State, config: dict) -> State:
 
     return {"messages": messages}
 
-# Define your node logic
-def echo_node(state: State, config):
-    new_msg = config["configurable"]["input"]
-    return {"messages": state.get("messages", []) + [new_msg]}
 
 # Build the graph
 graph = StateGraph(State)
@@ -80,7 +77,7 @@ graph = graph.compile(checkpointer=checkpointer)
 class GraphResponse(BaseModel):
     content: str
 
-def invoke_graph(query: str, conversation_id: str):
+def invoke_graph(query: str, conversation_id: str) -> GraphResponse:
     config = {
         "configurable": {
             "thread_id": conversation_id,
@@ -89,4 +86,4 @@ def invoke_graph(query: str, conversation_id: str):
     }
 
     result = graph.invoke(config=config, input={})
-    return result["messages"][-1].content
+    return GraphResponse(content=result["messages"][-1].content)
