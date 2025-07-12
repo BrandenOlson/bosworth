@@ -1,3 +1,4 @@
+from enum import Enum
 import sqlite3
 from typing import TypedDict, List
 
@@ -20,15 +21,12 @@ tools = DEFAULT_TOOLS
 llm = DEFAULT_LLM
 
 
-# Define your state schema
 class State(TypedDict):
     messages: List[BaseMessage]
 
 
 def agent_node(state: State, config: dict) -> State:
     query = config["configurable"]["input"]
-    tools = config.get("configurable", {}).get("tools", DEFAULT_TOOLS)
-    llm = config.get("configurable", {}).get("llm", DEFAULT_LLM)
 
     llm_with_tool = llm.bind_tools(tools)
 
@@ -59,23 +57,29 @@ def agent_node(state: State, config: dict) -> State:
     return {"messages": messages}
 
 
+class GraphNode(str, Enum):
+    AGENT = "agent"
+
+
 # Build the graph
 graph = StateGraph(State)
-graph.add_node("agent", agent_node)
-graph.set_entry_point("agent")
-graph.set_finish_point("agent")
+graph.add_node(GraphNode.AGENT, agent_node)
+graph.set_entry_point(GraphNode.AGENT)
+graph.set_finish_point(GraphNode.AGENT)
+
 
 # Create SQLite checkpoint saver
 conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
 checkpointer = SqliteSaver(conn)
 
+
 # Compile the graph with the checkpoint saver
 graph = graph.compile(checkpointer=checkpointer)
 
-# Simulate two turns of conversation
 
 class GraphResponse(BaseModel):
     content: str
+
 
 def invoke_graph(query: str, conversation_id: str) -> GraphResponse:
     config = {
