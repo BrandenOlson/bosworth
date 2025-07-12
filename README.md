@@ -1,6 +1,16 @@
 # bosworth 
 ### A boss agent worth your while 🦾💰
 
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![LangGraph](https://img.shields.io/badge/langgraph-🧠-purple)
+![FastAPI](https://img.shields.io/badge/framework-fastapi-009688)
+![License](https://img.shields.io/github/license/BrandenOlson/bosworth)
+
+## Overview
+
+`bosworth` is a simple agentic chatbot powered by [`ollama`](https://ollama.com), [`langgraph`](https://www.langchain.com/langgraph), and [`fastapi`](https://fastapi.tiangolo.com).
+It remembers things, calls tools, and runs with a single `curl` (though a CLI / GUI are on the horizon!).
+
 
 ## Setup 
 
