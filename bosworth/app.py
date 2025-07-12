@@ -1,10 +1,11 @@
+from uuid import uuid4
 from typing import Literal
 
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from bosworth.agent import invoke_agent
+from bosworth.graph import invoke_graph, GraphResponse
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ def ping() -> PingResponse:
 
 class ChatRequest(BaseModel):
     query: str
+    conversation_id: str = str(uuid4())
 
 
 class ChatResponse(BaseModel):
@@ -27,7 +29,12 @@ class ChatResponse(BaseModel):
 
 @app.post("/chat")
 def chat(request: ChatRequest) -> ChatResponse:
-    return ChatResponse(content=invoke_agent(query=request.query))
+    return ChatResponse(
+        content=invoke_graph(
+            query=request.query,
+            conversation_id=request.conversation_id,
+        ).content
+    )
 
 
 if __name__ == "__main__":

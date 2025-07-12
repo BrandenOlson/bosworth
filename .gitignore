@@ -1,4 +1,8 @@
 .idea
 **/__pycache__
 
+# ollama artifacts
 ollama.log
+
+# database artifacts
+checkpoints.sqlite*
