@@ -8,4 +8,5 @@ ollama.log
 checkpoints.sqlite*
 
 # evals artifacts
-eval_results.json
+eval_output
+
