@@ -1,0 +1,22 @@
+[
+  [
+    {
+      "query": "who are you",
+      "expected_text": ["bosworth"]
+    }
+  ],
+  [
+    {
+      "query": "whats with your name",
+      "expected_text": ["Branden Olson Steele", "BOS Life", "https://brandenolson.github.io"],
+      "expected_tool_calls": ["get_bosworth_identity"]
+    }
+  ],
+  [
+    {
+      "query": "what is your favorite number",
+      "expected_text": "13",
+      "expected_tool_calls": ["get_favorite_number"]
+    }
+  ]
+]

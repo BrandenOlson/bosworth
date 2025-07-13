@@ -6,3 +6,7 @@ ollama.log
 
 # database artifacts
 checkpoints.sqlite*
+
+# evals artifacts
+eval_output
+

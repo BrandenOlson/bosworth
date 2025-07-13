@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from bosworth.graph import invoke_graph, GraphResponse
+from bosworth.graph import invoke_agent, AgentResponse
 
 app = FastAPI()
 
@@ -23,17 +23,12 @@ class ChatRequest(BaseModel):
     conversation_id: str = str(uuid4())
 
 
-class ChatResponse(BaseModel):
-    content: str
-
 
 @app.post("/chat")
-def chat(request: ChatRequest) -> ChatResponse:
-    return ChatResponse(
-        content=invoke_graph(
-            query=request.query,
-            conversation_id=request.conversation_id,
-        ).content
+def chat(request: ChatRequest) -> AgentResponse:
+    return invoke_agent(
+        query=request.query,
+        conversation_id=request.conversation_id,
     )
 
 
