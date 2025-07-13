@@ -1,12 +1,16 @@
 import json
 from copy import deepcopy
 from functools import lru_cache
+from typing import Any
 
 import numpy as np
 from fastapi.testclient import TestClient
+from starlette.responses import Response
 
 from paths import EVAL_EXAMPLES_FILE
 from bosworth.app import app
+
+Turn = dict[str, Any]
 
 @lru_cache
 def bosworth_client() -> TestClient:
@@ -24,48 +28,59 @@ def normalize_text(text: str) -> str:
     return text.lower().strip()
 
 
-def evaluate_text(actual: str, expected: str | list) -> list[float]:
+def calculate_text_coverage(actual: str, expected: str | list) -> list[float]:
     actual_text = normalize_text(actual)
     expected_texts = [t.lower() for t in listify(expected)]
 
     return [100*int(expected in actual_text) for expected in expected_texts]
 
 
-
-def evaluate_tool_calls(actual: list[str], expected: list[str]) -> float:
+def calculate_tool_call_coverage(actual: list[str], expected: list[str]) -> list[float]:
     # TODO: generalize to beyond exact match
 
-    return 100*int(actual == expected)
+    return [100*int(actual == expected)]
 
-expected_text_hits = []
-expected_tool_call_hits = []
 
-examples_with_metrics = deepcopy(EXAMPLES)
+def evaluate_text(turn: Turn, response: Response) -> None:
+    response_text = response.json()["content"]
+    turn["agent_response"] = response_text
+    if "expected_text" in turn:
+        example_expected_text_scores = calculate_text_coverage(normalize_text(response_text), turn["expected_text"])
+        expected_text_hits.extend(example_expected_text_scores)
 
-for example in examples_with_metrics:
-    for turn in example:
-        response = bosworth_client().post("/chat", json={"query": turn["query"]})
-        response_text = response.json()["content"]
-        turn["agent_response"] = response_text
+        turn["includes_expected_text"] = example_expected_text_scores
 
-        if "expected_text" in turn:
-            example_expected_text_scores = evaluate_text(normalize_text(response_text), turn["expected_text"])
-            expected_text_hits.extend(example_expected_text_scores)
+def evaluate_tool_calls(turn: Turn, response: Response) -> None:
+    response_tool_calls = response.json()["tool_calls"]
+    turn["agent_tool_calls"] = response_tool_calls
+    if "expected_tool_calls" in turn:
+        example_expected_tool_call_scores = calculate_tool_call_coverage(response_tool_calls, turn["expected_tool_calls"])
+        expected_tool_call_hits.extend(example_expected_tool_call_scores)
 
-            turn["includes_expected_text"] = example_expected_text_scores
+        turn["includes_expected_tool_calls"] = example_expected_tool_call_scores
 
-        response_tool_calls = response.json()["tool_calls"]
-        turn["agent_tool_calls"] = response_tool_calls
-        if "expected_tool_calls" in turn:
-            example_expected_tool_call_score = evaluate_tool_calls(response_tool_calls, turn["expected_tool_calls"])
-            expected_tool_call_hits.append(example_expected_tool_call_score)
 
-            turn["includes_expected_tool_calls"] = example_expected_tool_call_score
+def process_turn(turn: dict[str, Any]) -> None:
+    response = bosworth_client().post("/chat", json={"query": turn["query"]})
 
-RESULTS_FILENAME = "eval_results.json"
-with open(RESULTS_FILENAME, "w") as f:
-    json.dump(examples_with_metrics, f, indent=4)
+    evaluate_text(turn, response)
+    evaluate_tool_calls(turn, response)
 
-print(f"Text coverage: {round(np.mean(expected_text_hits), 2)}")
-print(f"Tool call coverage: {round(np.mean(expected_tool_call_hits), 2)}")
 
+if __name__ == "__main__":
+    expected_text_hits: list[float] = []
+    expected_tool_call_hits: list[float] = []
+
+    examples_with_metrics = deepcopy(EXAMPLES)
+
+    for example in examples_with_metrics:
+        for turn in example:
+            process_turn(turn)
+
+
+    RESULTS_FILENAME = "eval_results.json"
+    with open(RESULTS_FILENAME, "w") as f:
+        json.dump(examples_with_metrics, f, indent=4)
+
+    print(f"Text coverage: {round(np.mean(expected_text_hits), 2)}")
+    print(f"Tool call coverage: {round(np.mean(expected_tool_call_hits), 2)}")

@@ -35,6 +35,9 @@ source ~/envs/bosworth/bin/activate
 - TODO: Combine python evn setup into `setup.sh`
 - TODO: Set up packages via `uv`
 
+
+## Runtime
+
 Start app in a shell:
 ```commandline
 PYTHONPATH=. python bosworth/app/main.py
@@ -42,10 +45,12 @@ PYTHONPATH=. python bosworth/app/main.py
 
 
 ```commandline
-> curl localhost:8000/chat -X POST -H 'Content-Type: application/json' -d '{"query": "hello"}' && echo
+curl localhost:8000/chat -X POST -H 'Content-Type: application/json' -d '{"query": "hello"}' && echo
 
 {"content":"Hello! It's great to meet you! I'm Bosworth, your friendly finance AI agent. I'm here to help answer any questions you have about personal finance, investing, or anything else related to money management.\n\nWhat can I assist you with today? Do you have a specific question or topic in mind?"}
 ```
+
+## Checks
 
 Run the tests via
 ```commandline
@@ -55,4 +60,9 @@ pytest test
 Run type checking via
 ```commandline
 mypy .
+```
+
+Run evals via
+```commandline
+PYTHONPATH=. python evals/run_evals.py
 ```
