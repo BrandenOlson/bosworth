@@ -6,6 +6,9 @@
 ![FastAPI](https://img.shields.io/badge/framework-fastapi-009688)
 ![License](https://img.shields.io/github/license/BrandenOlson/bosworth)
 
+#### Disclaimer: This project is very much a work-in-progress. Please reach out with any questions!
+
+
 ## Overview
 
 `bosworth` is a simple agentic chatbot powered by [`ollama`](https://ollama.com), [`langgraph`](https://www.langchain.com/langgraph), and [`fastapi`](https://fastapi.tiangolo.com).
