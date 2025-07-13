@@ -20,13 +20,13 @@ def bosworth_client() -> TestClient:
 @app_cli.command()
 def main(
     outdir: Path = typer.Option(
-        ..., "--outdir", "-o",
+        Path("eval_output"), "--outdir", "-o",
         help="Directory where eval results will be saved",
         exists=False, file_okay=False, writable=True, resolve_path=True,
     )
 ) -> None:
     outdir.mkdir(parents=True, exist_ok=True)
-    results_path = outdir / "metrics.json"
+    results_path = outdir / "annotated_examples.json"
 
     with open(EVAL_EXAMPLES_FILE, "r") as f:
         examples = json.load(f)
