@@ -23,7 +23,7 @@ class EvalPipeline:
     def process_turn(self, turn: Turn) -> None:
         response = self.bosworth_client.post("/chat", json={"query": turn["query"]})
         for evaluator in self.evaluators:
-            evaluator.evaluate(turn, response)
+            evaluator.evaluate(turn, response.json())
 
     def summary(self) -> dict[str, float]:
         combined = {}
