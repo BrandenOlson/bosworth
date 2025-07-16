@@ -32,16 +32,40 @@ else
   exit 1
 fi
 
-echo "📦 Pulling supported Ollama models from Python Enum..."
+#!/bin/bash
+
+echo "📦 Pulling models defined in ollama_models.py..."
+
+# Read models from Python output, line by line
 MODELS=$(python3 bosworth/ollama_models.py)
 
-for model in $MODELS; do
+# Pull each model
+echo "$MODELS" | while IFS= read -r model; do
   echo "  ➤ Pulling $model..."
   ollama pull "$model"
 done
 
+# Verify models are registered
 echo "🧪 Verifying models are registered..."
-ollama list | grep -E "llama3.2|mistral"
+OLLAMA_LIST=$(ollama list)
+MISSING=false
+
+echo "$MODELS" | while IFS= read -r model; do
+  if echo "$OLLAMA_LIST" | grep -q "$model"; then
+    echo "  ✅ $model is registered"
+  else
+    echo "  ❌ $model is NOT registered"
+    MISSING=true
+  fi
+done
+
+if [ "$MISSING" = true ]; then
+  echo "⚠️ One or more models are missing."
+else
+  echo "🎉 Setup complete!"
+  echo "➡️ Models are ready to use via http://localhost:11434"
+fi
 
 echo "🎉 Setup complete!"
-echo "➡️ Models 'llama3.2' and 'mistral' are ready to use via http://localhost:11434"
+COMMA_SEPARATED_MODELS=$(echo "$MODELS" | paste -sd, - | sed "s/,/, /g")
+echo "➡️ All models in {$COMMA_SEPARATED_MODELS} are ready to use via http://localhost:11434"
