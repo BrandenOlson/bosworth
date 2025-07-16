@@ -10,7 +10,7 @@ Turn = dict[str, Any]
 
 
 class BaseEvaluator:
-    def evaluate(self, turn: Turn, response: Response) -> None:
+    def evaluate(self, turn: Turn, response: dict[str, Any]) -> None:
         raise NotImplementedError
 
     def metrics(self) -> dict[str, float]:
@@ -24,7 +24,7 @@ class ScoringEvaluator(BaseEvaluator):
         response_key: str,
         expected_key: str,
         turn_output_key: str,
-        scoring_fn: Callable[[Any, Any], list[float]],
+        scoring_fn: Callable[[Any, Any], list[bool]],
         result_key: str,
     ):
         self.response_key = response_key
@@ -34,9 +34,8 @@ class ScoringEvaluator(BaseEvaluator):
         self.result_key = result_key
         self._hits: list[float] = []
 
-    def evaluate(self, turn: Turn, response: Response) -> None:
-        response_json = response.json()
-        actual = response_json[self.response_key]
+    def evaluate(self, turn: Turn, response: dict[str, Any]) -> None:
+        actual = response[self.response_key]
         turn[f"agent_{self.response_key}"] = actual
 
         if self.expected_key in turn:
@@ -45,9 +44,11 @@ class ScoringEvaluator(BaseEvaluator):
             turn[self.turn_output_key] = scores
             self._hits.extend(scores)
 
+
+
     def metrics(self) -> dict[str, float]:
         return {
-            self.result_key: float(round(np.mean(self._hits), 2) if self._hits else 0.0)
+            self.result_key: float(round(100.0*np.mean(self._hits), 2) if self._hits else 100.0)
         }
 
 
