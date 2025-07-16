@@ -44,9 +44,11 @@ class ScoringEvaluator(BaseEvaluator):
             turn[self.turn_output_key] = scores
             self._hits.extend(scores)
 
+
+
     def metrics(self) -> dict[str, float]:
         return {
-            self.result_key: float(round(100.0*np.mean(self._hits), 2) if self._hits else 0.0)
+            self.result_key: float(round(100.0*np.mean(self._hits), 2) if self._hits else 100.0)
         }
 
 

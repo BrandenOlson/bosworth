@@ -9,7 +9,8 @@ def normalize_text(text: str) -> str:
 def calculate_text_coverage(actual: str, expected: str | list) -> list[float]:
     actual_text = normalize_text(actual)
     expected_texts = [t.lower() for t in listify(expected)]
-    return [expected in actual_text for expected in expected_texts]
+    result = [expected in actual_text for expected in expected_texts]
+    return result
 
 
 def calculate_tool_call_coverage(actual: list[str], expected: list[str]) -> list[float]:
