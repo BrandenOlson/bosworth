@@ -39,7 +39,7 @@ def get_response_payload(content: str, tool_calls: list[str]) -> dict[str, Any]:
         ("who are you", ["bosworth", "ai agent"], "I'm an AI agent", [], 50.0),
     ]
 )
-def test_text_evaluator(query: str, expected_text: str | list[str], agent_content: str, agent_tool_calls: [], text_coverage: float, text_evaluator: TextEvaluator) -> None:
+def test_text_evaluator(query: str, expected_text: str | list[str], agent_content: str, agent_tool_calls: list[str], text_coverage: float, text_evaluator: TextEvaluator) -> None:
     text_evaluator.evaluate(
         turn=get_turn_payload(query=query, expected=expected_text, expected_key="expected_text"),
         response=get_response_payload(content=agent_content, tool_calls=agent_tool_calls)

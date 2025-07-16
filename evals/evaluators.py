@@ -24,7 +24,7 @@ class ScoringEvaluator(BaseEvaluator):
         response_key: str,
         expected_key: str,
         turn_output_key: str,
-        scoring_fn: Callable[[Any, Any], list[float]],
+        scoring_fn: Callable[[Any, Any], list[bool]],
         result_key: str,
     ):
         self.response_key = response_key

@@ -37,7 +37,7 @@ def test_normalize_text(example_input: str, expected_output: str) -> None:
         ("unrelated text", "reference text", [False]),
     ]
 )
-def test_calculate_text_coverage(actual: str, expected: list[str], expected_coverage: float):
+def test_calculate_text_coverage(actual: str, expected: list[str], expected_coverage: float) -> None:
     assert calculate_text_coverage(actual, expected) == expected_coverage
 
 
@@ -55,5 +55,5 @@ def test_calculate_text_coverage(actual: str, expected: list[str], expected_cove
         (["tool_1", "tool_2"], ["tool_3", "tool_4"], [False]),
     ]
 )
-def test_calculate_tool_call_coverage(actual: list[str], expected: list[str], expected_coverage: float):
+def test_calculate_tool_call_coverage(actual: list[str], expected: list[str], expected_coverage: float) -> None:
     assert calculate_tool_call_coverage(actual, expected) == expected_coverage
